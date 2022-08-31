@@ -11,7 +11,7 @@
                     <v-toolbar
                         flat
                     >
-                        <v-toolbar-title>My CRUD</v-toolbar-title>
+                        <v-toolbar-title>My CRUDs</v-toolbar-title>
                         <v-divider
                         class="mx-4"
                         inset
@@ -127,7 +127,7 @@
                         </v-dialog>
                     </v-toolbar>
                     </template>
-                    <template v-slot:item.actions="{ item }">
+                    <template v-slot:[`item.actions`]="{ item }">
                     <v-icon
                         small
                         class="mr-2"
