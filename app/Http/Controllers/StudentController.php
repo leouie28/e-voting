@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\Filter;
+use App\Imports\StudentImport;
 use App\Models\Student;
 use Exception;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
@@ -15,7 +18,8 @@ class StudentController extends Controller
      */
     public function index()
     {
-        return Student::all();
+        $model = Student::class;
+        return (new Filter($model))->searchable();
     }
 
     /**
@@ -37,7 +41,7 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         try{
-            if(Student::where('student_id', $request->student_id)){
+            if(Student::where('student_id', $request->student_id)->exists()){
                 return [
                     'data' => $request,
                     'type' => 'error',
@@ -59,6 +63,28 @@ class StudentController extends Controller
                 'type' => 'error',
                 'message' => $e->getMessage(),
             ];
+        }
+    }
+
+    public function importExcel(Request $request)
+    {
+        try{
+            // return $request;
+            // Excel::import(new StudentImport(), $request->file);
+            $import = new StudentImport;
+            $import->import($request->file);
+
+            return $import->failures();
+            
+            // if($import->failures()->isNotEmpty()){
+            //     return [
+            //         'data' => $import->failures(),
+            //     ];
+            // }
+
+            return 'success';
+        }catch(Exception $e){
+            return $e->getMessage();
         }
     }
 
