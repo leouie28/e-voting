@@ -64,7 +64,7 @@
         @save="save"
         @update="update">
         </data-form>
-        <excel-form :show="excelForm" @close="close" @save="save"></excel-form>
+        <excel-form :show="excelForm" @notify="notify" @close="close" @save="save"></excel-form>
         <Alert :data="alert_data"></Alert>
         <Warning :data="warning_data" @close="close" @confirm="confirm"></Warning>
     </div>
@@ -141,6 +141,9 @@ export default {
                 this.showForm = false;
                 this.payload = null;
             })
+        },
+        notify(data) {
+          this._newAlert(true, data.type, data.message)
         },
         update(payload) {
             axios.put(`/admin-api/student/${this.selectedItem.id}`, payload).then(({ data }) => {

@@ -38,7 +38,7 @@
                             hide-details="auto"
                             ></v-text-field>
                         </v-col>
-                        <v-col md="12" cols="12">
+                        <!-- <v-col md="12" cols="12">
                             <v-radio-group
                             class="mt-0"
                             row
@@ -54,7 +54,7 @@
                                 value="0"
                             ></v-radio>
                             </v-radio-group>
-                        </v-col>
+                        </v-col> -->
                     </v-row>
                 </v-card-text>
                 <v-card-actions>

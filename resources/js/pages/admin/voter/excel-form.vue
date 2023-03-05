@@ -98,11 +98,11 @@ export default {
                 let formData = new FormData();
                 formData.append('file', this.file);
                 axios.post(`/admin-api/student/insert-excel`, formData, config).then(({data}) => {
-
+                  this.inserting = false
+                  this.$emit('notify', data)
                 }).finally(() => {
                     setTimeout(() => {
                         this.inserting = false
-                        this.closeThis()
                     },2000)
                 })
             }else{

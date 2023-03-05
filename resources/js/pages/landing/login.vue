@@ -77,19 +77,23 @@ export default {
             }else{
                 axios.post('/web/login', this.payload).then(({data}) => {
                     if(data.user){
-                        if(data.role=='admin'){
-                            this.$router.push({path: '/admin/status'})
-                        }else if(data.role=='student'){
-                            if(this.$route.name=='student-election') {
-                                location.reload()
-                            }
-                            this.$router.push({path: '/home'})
-                        }
+                        this.checkRoute(data.role)
                     }else{
                         this.message = data.message
                     }
                 })
             }
+        },
+        checkRoute(role) {
+          if(this.$route.path=='/login'){
+            if(role=='admin'){
+                this.$router.push({path: '/admin/status'})
+            }else if(role=='student'){
+              this.$router.push({path: '/home'})
+            }
+          }else {
+            location.reload()
+          }
         }
     }
 }

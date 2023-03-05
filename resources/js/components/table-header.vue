@@ -16,7 +16,7 @@
                 {{ data.isFetching ? "mdi-spin" : "" }}
             </v-icon>
             <v-spacer></v-spacer>
-            <div class="d-inline mr-2">
+            <div class="d-inline mr-2" v-if="!hide.includes('search')">
                 <v-text-field
                 dense
                 placeholder="Search ..."

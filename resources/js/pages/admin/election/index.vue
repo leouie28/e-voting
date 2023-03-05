@@ -7,7 +7,7 @@
                 @refresh="fetchPage"
                 @importExcel="importExcel"
                 @search="fetchPage"
-                :hide="['filter', 'download', 'excel']"
+                :hide="['filter', 'download', 'excel', 'search']"
             >
                 <template v-slot:custom_filter>
                     <admin-filter :filter="data.filter"></admin-filter>
