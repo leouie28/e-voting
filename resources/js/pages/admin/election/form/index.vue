@@ -4,7 +4,7 @@
             <v-card-title>
                 Election Form
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" v-if="!isShow">
+                <v-btn color="secondary" v-if="!isShow" @click="$router.push({ path: '/admin/election' })">
                     <v-icon class="mr-2">mdi-backspace</v-icon>
                     Return
                 </v-btn>
@@ -114,6 +114,7 @@
             @close="warning_data.trigger = false"
             @confirm="create"
         ></Warning>
+        <Loader v-show="loading" />
     </div>
 </template>
 <script>
@@ -130,6 +131,7 @@ export default {
         isShow: false,
         step: 1,
         url: "",
+        loading: false,
         payload: {
             election: {
                 name: "",
@@ -190,10 +192,12 @@ export default {
         },
         create() {
             this.warning_data.trigger = false;
+            this.loading = true
             localStorage.setItem("payload", JSON.stringify(this.payload));
             axios
                 .post(`/admin-api/election/store-set`, this.payload)
                 .then(({ data }) => {
+                    this.loading = false
                     this._newAlert(true, data.type, data.message);
                 })
                 .finally(() => {

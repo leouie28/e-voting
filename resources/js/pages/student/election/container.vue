@@ -29,24 +29,47 @@
             </v-card-text>
             <v-card-actions>
                 <v-btn
-                v-if="!isClose"
+                v-if="checkStatus=='notOpen'"
                 block
-                @click="$emit('codeDialog')"
+                disabled
                 color="primary"
                 large
                 outlined>
-                    Vote Now
+                    Not Open
                     <v-icon class="ml-1">mdi-checkbox-outline</v-icon>
                 </v-btn>
                 <v-btn
-                v-else
+                v-if="checkStatus=='closed'"
                 block
+                @click="$router.push({path: '/election/'+elect.urlkey+'/result'})"
                 dark
                 color="brown"
                 large>
                     View Result
                     <v-icon class="ml-1">mdi-chart-box</v-icon>
                 </v-btn>
+                <template v-if="checkStatus=='open'">
+                    <v-btn
+                    v-if="!elect.voted"
+                    block
+                    @click="$emit('codeDialog')"
+                    color="primary"
+                    large
+                    outlined>
+                        Vote Now
+                        <v-icon class="ml-1">mdi-checkbox-outline</v-icon>
+                    </v-btn>
+                    <v-btn
+                    v-else
+                    block
+                    color="success"
+                    large
+                    disabled
+                    outlined>
+                        Vote Submitted
+                        <v-icon class="ml-1">mdi-checkbox-outline</v-icon>
+                    </v-btn>
+                </template>
             </v-card-actions>
         </v-card>
     </div>
@@ -60,15 +83,19 @@ export default {
         }
     },
     computed: {
-        isClose() {
+        checkStatus() {
             let now = this.moment().toISOString()
             let close = this.moment(this.elect.closing).toISOString()
-            if(now>=close) {
-                return true
-            }else {
-                return false
+            let open = this.moment(this.elect.opening).toISOString()
+            if(open>now) {
+                return 'notOpen'
             }
-        }
+            if(now>close) {
+                return 'closed'
+            }else {
+                return 'open'
+            }
+        },
     }
 }
 </script>

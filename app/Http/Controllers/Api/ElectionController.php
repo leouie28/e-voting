@@ -18,7 +18,7 @@ class ElectionController extends Controller
     public function index()
     {
         try{
-            return Election::get();
+            return Election::orderBy('id', 'desc')->get();
         }catch(Exception $e) {
             return $e->getMessage();
         }
@@ -72,7 +72,7 @@ class ElectionController extends Controller
     public function show($id)
     {
         try{
-            return Election::where('urlkey', $id)->first();
+            return Election::with('positions')->where('urlkey', $id)->first();
         }catch(Exception $e) {
             return $e->getMessage();
         }

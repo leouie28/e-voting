@@ -1,10 +1,12 @@
 <script>
 import Warning from "@/components/Warning.vue";
 import Alert from "@/components/Alert.vue";
+import Loader from "@/components/loader.vue"
 export default {
     components: {
         Warning,
         Alert,
+        Loader,
     },
     data() {
         return {

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Election extends Model
 {
@@ -33,7 +34,13 @@ class Election extends Model
         'opening',
         'closing',
         'voters_count',
+        'voted'
     ];
+
+    public function getVotedAttribute()
+    {
+        return $this->votes()->where('student_id', Auth::id())->exists();
+    }
 
     public function getVotersCountAttribute() {
         return Student::count();

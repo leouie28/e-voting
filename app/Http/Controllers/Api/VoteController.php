@@ -41,7 +41,7 @@ class VoteController extends Controller
     public function store(Request $request)
     {
         try{
-            $voted = Vote::where('student_id', Auth::guard('web')->user()->id)->first();
+            $voted = Election::find($request->id)->voted;
             if(!$voted) {
                 $elect = Election::find($request->id);
                 if($this->validateElection($elect->id)) {
@@ -72,7 +72,11 @@ class VoteController extends Controller
                             $this->extractVote($votes->id, $position['id'], $position['vote'], $student_id);
                         }
                     }
-                    return $votes;
+                    return [
+                        'data' => $votes,
+                        'type' => 'success',
+                        'message' => 'Vote successfully submitted...'
+                    ];
                 }else {
                     return [
                         'data' => $elect,

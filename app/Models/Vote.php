@@ -23,17 +23,17 @@ class Vote extends Model
 
     public function getVoterAttribute()
     {
-        return $this->student->name;
+        return $this->student()->first()->name;
     }
 
     public function getVoterNameAttribute()
     {
-        return $this->student->name;
+        return $this->student()->first()->name;
     }
 
     public function getVoterIdAttribute()
     {
-        return $this->student->student_id;
+        return $this->student()->first()->student_id;
     }
 
     public function election()

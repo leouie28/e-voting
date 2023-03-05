@@ -83,6 +83,12 @@ export default [
         meta: { requireAuth: true },
     },
     {
+        path:'/election/:key/result',
+        component: () => import('@/pages/student/election/result.vue'),
+        name:'student-election-result',
+        meta: { requireAuth: true },
+    },
+    {
         path:'/account',
         component: () => import('@/pages/student/account/index.vue'),
         name:'student-account',
