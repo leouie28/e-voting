@@ -1,103 +1,68 @@
 <template>
-  <div>
-    <v-card elevation="0" class="pa-2">
-      <table-header
-        :data="data"
-        @addNew="addNew"
-        @refresh="fetchPage"
-        @search="fetchPage"
-        @resetFilters="resetFilter"
-        @filterRecord="fetchPage"
-        :hide="['filter', 'download']"
-      >
-        <template v-slot:custom_filter>
-          <admin-filter :filter="data.filter"></admin-filter>
+    <div class="pa-2">
+        <v-card elevation="2" class="pa-2">
+            <table-header
+            :data="data"
+            @addNew="addNew"
+            @refresh="fetchPage"
+            @importExcel="importExcel"
+            @search="fetchPage"
+            :hide="['filter', 'download', 'excel']">
+                <template v-slot:custom_filter>
+                    <admin-filter :filter="data.filter"></admin-filter>
+                </template>
+            </table-header>
+            <v-data-table
+            :headers="headers"
+            :items="data_items"
+            :search="data.keyword"
+            :loading="data.isFetching"
+            :server-items-length="total"
+            :footer-props="footerPages"
+            :options.sync="options"
+            :items-per-page="options.itemsPerPage"
+            @update:options="fetchPage"
+            @click:row="viewItem"
+            class="cursor-pointer table-fix-height clickable-item"
+            fixed-header>
+                <template v-slot:[`item.created_at`]="{ item }">
+                    {{ moment(item.created_at).format('YYYY-MM-DD, h:mm a') }}
+                </template>
+                <template v-slot:[`item.action`]="{ item }">
+                    <v-btn
+                        color="primary"
+                        small
+                        @click="editItem(item)"
+                    >
+                        <v-icon small class="mr-1">mdi-eye</v-icon>
+                        View
+                    </v-btn>
+                    <!-- <v-btn
+                        class="px-2"
+                        elevation="0"
+                        icon
+                        color="error"
+                        @click="warning(item)"
+                    >
+                        <v-icon>mdi-trash-can</v-icon>
+                    </v-btn> -->
+                </template>
+                <template v-slot:no-data>
+                    <div>No Data</div>
+                </template>
+            </v-data-table>
+        </v-card>
+        <template v-if="form">
+            <data-form
+            :show="true"
+            :data="selectedItem" 
+            @close="close" @save="save" 
+            @update="update">
+            </data-form>
         </template>
-      </table-header>
-      <v-data-table
-        :headers="headers"
-        :items="categories"
-        max-height="100%"
-        :search="data.keyword"
-        :loading="data.isFetching"
-        :server-items-length="total"
-        :footer-props="footerPages"
-        :options.sync="options"
-        :items-per-page="options.itemsPerPage"
-        @update:options="fetchPage"
-        @click:row="viewProduct"
-        class="cursor-pointer table-fix-height"
-        fixed-header
-      >
-        <template v-slot:[`item.name`]="{ item }">
-          <span class="text-capitalize">{{item.name}}</span>
-        </template>
-        <template v-slot:[`item.color`]="{ item }">
-          <v-chip small :color="item.color" v-if="item.color!=null">
-            <span class="text-capitalize">{{ item.color }}</span>
-          </v-chip>
-          <span v-else>...</span>
-        </template>
-        <template v-slot:[`item.icon`]="{ item }">
-            <v-chip label small v-if="item.icon!=null">
-                <v-icon small class="mr-1">mdi-{{item.icon}}</v-icon>
-                {{item.icon}}
-            </v-chip>
-            <span v-else>...</span>
-        </template>
-        <template v-slot:[`item.created_at`]="{ item }">
-          <!-- {{ moment(item.created_at).format('MMMM DD YYYY') }} -->
-        </template>
-        <template v-slot:[`item.action`]="{ item }">
-          <v-btn
-            class="px-2"
-            small
-            elevation="0"
-            color="primary"
-            @click="editItem(item)"
-          >
-            <v-icon small>mdi-square-edit-outline</v-icon>
-          </v-btn>
-          <v-btn
-            class="px-2"
-            small
-            elevation="0"
-            color="error"
-            @click="warning(item)"
-          >
-            <v-icon small>mdi-trash-can</v-icon>
-          </v-btn>
-        </template>
-        <template v-slot:no-data>
-          <div>No Data</div>
-        </template>
-      </v-data-table>
-    </v-card>
-    <v-dialog v-model="showForm" persistent max-width="500">
-      <data-form :selectedItem="selectedItem" @cancel="close" @save="save" @update="update"> </data-form>
-    </v-dialog>
-    <v-dialog v-model="deleteForm" persistent width="500">
-      <delete-dialog :data="item" @close="close" @confirm="confirm"></delete-dialog>
-    </v-dialog>
-    <v-snackbar
-    v-model="alert.trigger"
-    multi-line
-    elevation="12"
-    :color="alert.color"
-    transition="scroll-x-reverse-transition"
-    top
-    right>
-      <div class="d-flex justify-space-between">
-        <div class="mr-2">
-          <v-icon large>info</v-icon>
-          {{ alert.text }}
-        </div>
-        <v-btn @click="alert.trigger = false">
-          Close
-        </v-btn>
-      </div>
-    </v-snackbar>
-  </div>
+        <Alert :data="alert_data"></Alert>
+        <Warning :data="warning_data" @close="close" @confirm="confirm"></Warning>
+    </div>
 </template>
 
 <script>
@@ -105,137 +70,98 @@ import DeleteDialog from "@/components/deleteDialog.vue";
 import DataForm from "./form.vue";
 import TableHeader from "@/components/table-header.vue";
 export default {
-  components: {
-    DeleteDialog,
-    DataForm,
-    TableHeader,
-  },
-  data: () => ({
-    data: {
-      title: "Categories",
-      isFetching: false,
-      keyword: "",
-      filter: {},
+    components: {
+        DeleteDialog,
+        DataForm,
+        TableHeader,
     },
-    footerPages: {
-      "items-per-page-options": [5, 10, 15, 20, 30, 40, 50, 100, -1],
+    data: () => ({
+        form: false,
+        excelForm: false,
+        data: {
+            title: "Announcement",
+            isFetching: false,
+            keyword: "",
+            filter: {},
+        },
+        footerPages: {
+            "items-per-page-options": [5, 10, 15, 20, 30, 40, 50, 100, -1],
+        },
+        options: {
+            itemsPerPage: 15,
+        },
+        total: 0,
+        deleteForm: false,
+        showForm: false,
+        dialogDelete: false,
+        items: [],
+        selectedItem: {},
+        selected: [],
+        headers: [
+            { text: "ID", align: "start", sortable: true, value: "id", },
+            { text: "Title", align: "start", sortable: true, value: "title", },
+            { text: "Content", align: "start", sortable: false, value: "content", },
+            { text: "Date Added", align: "start", sortable: true, value: "created_at", },
+            { text: "Actions", align: "center", sortable: false, value: "action", },
+        ],
+    }),
+    methods: {
+        fetchPage() {
+            this.data.isFetching = true;
+            let params = this._createParams(this.options);
+            params = params + this._createFilterParams(this.data.filter);
+            if (this.data.keyword) params = params + "&keyword=" + this.data.keyword;
+            axios.get(`/admin-api/announcement?${params}`).then(({ data }) => {
+                this.data_items = data.data;
+                this.total = data.total;
+                this.data.isFetching = false;
+            });
+        },
+        editItem(val){
+            // console.log(this.alert_data.trigger, val,'trigger')
+            this._commit('is_editing', true)
+            this.selectedItem = val
+            this.form = true
+        },
+        save(payload) {
+            this.form = false
+            axios.post(`/admin-api/announcement`, payload).then(({ data }) => {
+                this.fetchPage()
+                this._newAlert(true, data.type, data.message)
+            }).finally(()=>{
+                this.showForm = false;
+                this.payload = null;
+            })
+        },
+        update(payload) {
+            axios.put(`/admin-api/announcement/${payload.id}`, payload).then(({ data }) => {
+                this.form = false;
+                this.fetchPage()
+                this._newAlert(true, data.type, data.message)
+                this.selectedItem = null;
+            })
+        },
+        importExcel() {
+            this.excelForm = true
+        },
+        close() {
+            this.selectedItem = {}
+            this.form = false
+            this.warning_data.trigger = false
+        },
+        warning(val){
+            this.selectedItem = val
+            let text = 'Are you sure you want to delete'
+            this._warning(true, text, val.title)
+            this.deleteForm = true
+        },
+        confirm() {
+            this.warning_data.trigger = false
+            axios.delete(`/admin-api/announcement/${this.selectedItem.id}`).then(({data})=>{
+                this.fetchPage()
+                this._newAlert(true, data.type, data.message)
+            });
+        }
     },
-    options: {
-      itemsPerPage: 15,
-    },
-    total: 0,
-    deleteForm: false,
-    showForm: false,
-    dialogDelete: false,
-    categories: [],
-    selectedItem: {},
-    item: {},
-    selected: [],
-    title: "Categories",
-    headers: [
-      {
-        text: "ID",
-        align: "start",
-        sortable: true,
-        value: "id",
-      },
-      {
-        text: "Name",
-        align: "start",
-        sortable: true,
-        value: "name",
-      },
-      {
-        text: "Color",
-        align: "start",
-        sortable: false,
-        value: "color",
-      },
-      {
-        text: "Icon",
-        align: "start",
-        sortable: false,
-        value: "icon",
-      },
-      {
-        text: "Products",
-        align: "start",
-        sortable: false,
-        value: "products_count",
-      },
-      {
-        text: "Date Added",
-        align: "start",
-        sortable: false,
-        value: "created_at",
-      },
-      {
-        text: "Actions",
-        align: "center",
-        sortable: false,
-        value: "action",
-      },
-    ],
-  }),
-  methods: {
-    viewProduct() {},
-    resetFilter() {},
-    fetchPage() {
-      this.data.isFetching = true;
-      let params = this._createParams(this.options);
-      params = params + this._createFilterParams(this.data.filter);
-      if (this.data.keyword) params = params + "&keyword=" + this.data.keyword;
-      axios.get(`/admin-api/category?${params}`).then(({ data }) => {
-        this.categories = data.data;
-        this.total = data.total;
-        this.data.isFetching = false;
-      });
-    },
-    editItem(val){
-      // console.log(this.alert.trigger,'trigger')
-      this.selectedItem = val
-      this.showForm = true
-    },
-    save(payload) {
-      axios.post(`/admin-api/category`, payload).then(({ data }) => {
-        this.fetchPage()
-        this.newAlert(true, data.type, data.message)
-      }).finally(()=>{
-        this.showForm = false;
-        this.payload = {};
-      })
-    },
-    update(payload) {
-      axios.put(`/admin-api/category/${this.selectedItem.id}`, payload).then(({ data }) => {
-        this.showForm = false;
-        this.fetchPage()
-        this.newAlert(true, data.type, data.message)
-        this.payload = {};
-      })
-    },
-    addNew() {
-      this.showForm = true;
-    },
-    close() {
-      this.selectedItem = {}
-      this.showForm = false;
-      this.deleteForm = false
-    },
-    warning(val){
-      this.item = {
-        id: val.id,
-        text: val.name,
-        model: 'category'
-      }
-      this.deleteForm = true
-    },
-    confirm() {
-      axios.delete(`/admin-api/${this.item.model}/${this.item.id}`).then(({data})=>{
-        this.deleteForm = false
-        this.fetchPage()
-        this.newAlert(true, data.type, data.message)
-      });
-    }
-  },
 };
 </script>

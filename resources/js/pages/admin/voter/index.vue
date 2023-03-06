@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="pa-2">
         <v-card elevation="2" class="pa-2">
             <table-header
             :data="data"
@@ -7,14 +7,14 @@
             @refresh="fetchPage"
             @importExcel="importExcel"
             @search="fetchPage"
-            :hide="['filter', 'download']">
+            :hide="['gridView', 'filter', 'download']">
                 <template v-slot:custom_filter>
                     <admin-filter :filter="data.filter"></admin-filter>
                 </template>
             </table-header>
             <v-data-table
             :headers="headers"
-            :items="records"
+            :items="data_items"
             :search="data.keyword"
             show-select
             :loading="data.isFetching"
@@ -23,31 +23,14 @@
             :options.sync="options"
             :items-per-page="options.itemsPerPage"
             @update:options="fetchPage"
-            @click:row="viewProduct"
-            class="cursor-pointer table-fix-height"
+            @click:row="viewItem"
+            class="cursor-pointer table-fix-height clickable-item"
             fixed-header>
-                <!-- <template v-slot:[`item.name`]="{ item }">
-                    <v-avatar size="35" style="border: 1px solid #ccc">
-                        <img
-                        alt="image"
-                        :src="item.images.length?'/images/customer/' + item.images[0].file_name:'/images/default/person.png'"
-                        />
-                    </v-avatar>
-                    {{ item.first_name+ ' '+item.last_name }}
-                </template> -->
-                <template v-slot:[`item.voted`]="{ item }">
-                    <v-chip color="error" small>No</v-chip>
-                </template>
                 <template v-slot:[`item.created_at`]="{ item }">
                     {{ moment(item.created_at).format('YYYY-MM-DD') }}
                 </template>
-                <template v-slot:[`item.active`]="{ item }">
-                    <v-switch
-                    v-model="item.active"
-                    color="success"
-                    inset
-                    :label="item.active?'Active':'Inactive'"
-                    ></v-switch>
+                <template v-slot:[`item.status`]="{ item }">
+                    <v-icon :color="item.status==1?'success':'error'">mdi-{{item.status==1?'check':'close'}}</v-icon>
                 </template>
                 <template v-slot:[`item.action`]="{ item }">
                     <v-btn
@@ -55,7 +38,7 @@
                         elevation="0"
                         icon
                         color="primary"
-                        @click="editItem(item)"
+                        @click.stop="editItem(item)"
                     >
                         <v-icon>mdi-square-edit-outline</v-icon>
                     </v-btn>
@@ -74,8 +57,16 @@
                 </template>
             </v-data-table>
         </v-card>
-        <data-form :show="form" @close="close" @save="save"></data-form>
-        <excel-form :show="excelForm" @close="close" @save="save"></excel-form>
+        <data-form
+        :show="form"
+        :data="selectedItem"
+        @close="close"
+        @save="save"
+        @update="update">
+        </data-form>
+        <excel-form :show="excelForm" @notify="notify" @close="close" @save="save"></excel-form>
+        <Alert :data="alert_data"></Alert>
+        <Warning :data="warning_data" @close="close" @confirm="confirm"></Warning>
     </div>
 </template>
 
@@ -114,42 +105,12 @@ export default {
         selectedItem: {},
         selected: [],
         headers: [
-            {
-                text: "Student Id",
-                align: "start",
-                sortable: true,
-                value: "student_id",
-            },
-            {
-                text: "Name",
-                align: "start",
-                sortable: true,
-                value: "name",
-            },
-            {
-                text: "Voted",
-                align: "start",
-                sortable: true,
-                value: "voted",
-            },
-            {
-                text: "Date Added",
-                align: "start",
-                sortable: false,
-                value: "created_at",
-            },
-            {
-                text: "Active",
-                align: "start",
-                sortable: true,
-                value: "active",
-            },
-            {
-                text: "Actions",
-                align: "center",
-                sortable: false,
-                value: "action",
-            },
+            { text: "Student Id", align: "start", sortable: true, value: "student_id", },
+            { text: "Name", align: "start", sortable: true, value: "name", },
+            // { text: "Voted", align: "start", sortable: false, value: "voted", },
+            { text: "Date Added", align: "start", sortable: true, value: "created_at", },
+            { text: "Active", align: "start", sortable: false, value: "status", },
+            { text: "Actions", align: "center", sortable: false, value: "action", },
         ],
     }),
     methods: {
@@ -159,34 +120,41 @@ export default {
             params = params + this._createFilterParams(this.data.filter);
             if (this.data.keyword) params = params + "&keyword=" + this.data.keyword;
             axios.get(`/admin-api/student?${params}`).then(({ data }) => {
-                this.records = data.data;
+                this.data_items = data.data;
                 this.total = data.total;
                 this.data.isFetching = false;
             });
         },
         editItem(val){
-            console.log(this.alert.trigger,'trigger')
+            // console.log(this.alert.trigger,'trigger')
+            this._commit('is_editing', true)
             this.selectedItem = val
-            this.showForm = true
+            this.form = true
         },
         save(payload) {
             this.form = false
             console.log(payload)
             axios.post(`/admin-api/student`, payload).then(({ data }) => {
                 this.fetchPage()
-                this.newAlert(true, data.type, data.message)
+                this._newAlert(true, data.type, data.message)
             }).finally(()=>{
                 this.showForm = false;
                 this.payload = null;
             })
         },
+        notify(data) {
+          this._newAlert(true, data.type, data.message)
+        },
         update(payload) {
-            axios.put(`/admin-api/customer/${this.selectedItem.id}`, payload).then(({ data }) => {
-                this.showForm = false;
+            axios.put(`/admin-api/student/${this.selectedItem.id}`, payload).then(({ data }) => {
                 this.fetchPage()
-                this.newAlert(true, data.type, data.message)
+                this._newAlert(true, data.type, data.message)
                 this.payload = null;
             })
+            this.form = false
+        },
+        activate() {
+
         },
         importExcel() {
             this.excelForm = true
@@ -194,21 +162,20 @@ export default {
         close() {
             this.form = false
             this.excelForm = false
+            this.fetchPage()
         },
         warning(val){
-        this.user = {
-            id: val.id,
-            text: val.first_name+' '+val.last_name,
-            model: 'customer'
-        }
-        this.deleteForm = true
+            this.selectedItem = val
+            let text = 'Are you sure you want to delete'
+            this._warning(true, text, val.name)
+            this.deleteForm = true
         },
         confirm() {
-        axios.delete(`/admin-api/${this.user.model}/${this.user.id}`).then(({data})=>{
-            this.deleteForm = false
-            this.fetchPage()
-            this.newAlert(true, data.type, data.message)
-        });
+            this.warning_data.trigger = false
+            axios.delete(`/admin-api/student/${this.selectedItem.id}`).then(({data})=>{
+                this.fetchPage()
+                this._newAlert(true, data.type, data.message)
+            });
         }
     },
 };

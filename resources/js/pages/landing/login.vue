@@ -3,12 +3,13 @@
         <v-card rounded="lg" elevation="4" max-width="400" class="mx-auto py-4">
             <v-card-text>
                 <div class="text-center mb-8">
-                    <v-avatar size="150" class="mx-auto">
+                    <v-avatar size="170" class="mx-auto">
                         <v-img
                         alt="School Logo"
-                        src="https://picsum.photos/500/300?image=40"
+                        src="/images/system/logo.png"
                         ></v-img>
                     </v-avatar>
+                    <h4 class="mt-3 secondary--text">CKC Voting System</h4>
                 </div>
                 <v-row>
                     <v-col cols="12" md="12">
@@ -18,21 +19,23 @@
                         dense
                         v-model="payload.user_id"
                         :rules="rule"
-                        label="School Id"
+                        color="brown"
+                        placeholder="Student Id"
                         required
                         prepend-inner-icon="mdi-account"
-                        placeholder="00-0000"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="12">
                         <v-text-field
                         outlined
+                        v-on:keyup.enter="login"
                         hide-details="auto"
                         dense
                         v-model="payload.password"
                         :rules="rule"
                         required
-                        label="Password"
+                        color="brown"
+                        placeholder="Password"
                         type="password"
                         prepend-inner-icon="mdi-lock"
                         ></v-text-field>
@@ -44,8 +47,9 @@
                         <v-btn
                         block
                         large
+                        dark
                         @click="login"
-                        color="secondary">
+                        color="brown">
                             Login
                         </v-btn>
                     </v-col>
@@ -73,16 +77,23 @@ export default {
             }else{
                 axios.post('/web/login', this.payload).then(({data}) => {
                     if(data.user){
-                        if(data.role=='admin'){
-
-                        }else if(data.role=='student'){
-
-                        }
+                        this.checkRoute(data.role)
                     }else{
                         this.message = data.message
                     }
                 })
             }
+        },
+        checkRoute(role) {
+          if(this.$route.path=='/login'){
+            if(role=='admin'){
+                this.$router.push({path: '/admin/status'})
+            }else if(role=='student'){
+              this.$router.push({path: '/home'})
+            }
+          }else {
+            location.reload()
+          }
         }
     }
 }

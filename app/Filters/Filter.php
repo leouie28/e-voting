@@ -2,8 +2,6 @@
 
 namespace App\Filters;
 
-use App\Models\Student;
-
 class Filter
 {
 
@@ -15,7 +13,7 @@ class Filter
     public function searchable()
     {
         // $this->searchColumns();
-        // $this->sortBy();
+        $this->sortBy();
         // $this->orderCount();
         $per_page = Request()->per_page;
         if ($per_page == '-1' || !isset(Request()->per_page)) return $this->model->paginate($this->model->count());
@@ -26,12 +24,22 @@ class Filter
     {
         $searchable = ['name'];
         if (Request()->keyword && Request()->keyword != "null") {
-        $keyword = Request()->keyword;
-        foreach ($searchable as $column) {
-            if ($column == 'name') {
-            $this->model->orWhere($column, 'like', "%" . $keyword . "%");
+            $keyword = Request()->keyword;
+            foreach ($searchable as $column) {
+                if ($column == 'name') {
+                $this->model->orWhere($column, 'like', "%" . $keyword . "%");
+                }
             }
         }
+    }
+
+    public function sortBy()
+    {
+        if(Request()->sort && Request()->sort != "null")
+        {
+            
+        }else{
+            $this->model->orderBy('id', 'desc');
         }
     }
 }

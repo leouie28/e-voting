@@ -35,9 +35,32 @@
                     <v-btn text :disabled="inserting" @click="$emit('close')">
                         Close
                     </v-btn>
-                    <v-btn color="secondary" :disabled="inserting" @click="insertRecord">
+                    <v-btn color="secondary" :disabled="inserting" @click="warning">
                         Insert records
                         <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog persistent max-width="450" v-model="warnDialog">
+            <v-card>
+                <v-card-title>
+                    Warning
+                    <v-spacer></v-spacer>
+                    <v-btn icon @click="warnDialog = false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                </v-card-title>
+                <v-card-text class="text-center">
+                    Are you sure you want to insert this records?
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text @click="warnDialog = false">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="insertRecord">
+                        Confirm
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -50,13 +73,19 @@ export default {
         file_name: '',
         file: '',
         inserting: false,
+        warnDialog: false,
+        warningData: {},
     }),
     methods: {
+        warning() {
+            this.warnDialog = true
+        },
         onFileChange(e) {
             this.file_name = e.target.files[0].name
             this.file = e.target.files[0]
         },
         insertRecord() {
+            this.warnDialog = false
             if(this.file){
                 this.inserting = true
                 const config = {
@@ -69,18 +98,21 @@ export default {
                 let formData = new FormData();
                 formData.append('file', this.file);
                 axios.post(`/admin-api/student/insert-excel`, formData, config).then(({data}) => {
-
+                  this.inserting = false
+                  this.$emit('notify', data)
                 }).finally(() => {
                     setTimeout(() => {
                         this.inserting = false
-                        this.closeThis()
                     },2000)
                 })
+            }else{
+                alert('Empty file')
             }
         },
         closeThis() {
             setTimeout(() => {
                 this.$emit('close')
+                this.$emit('fetchPage')
             },1000)
         }
     },

@@ -1,8 +1,11 @@
 <template>
     <div>
-        <div style="height:150px">
+        <div style="height:150px" class="text-center">
             <v-img
-            src="https://picsum.photos/500/300?image=40">
+            class="text-center mx-auto my-4" 
+            height="170"
+            width="170"
+            src="/images/system/logo.png">
             </v-img>
         </div>
       <v-list class="mt-5">
@@ -29,6 +32,7 @@
             block
             elevation="2"
             color="brown lighten-4"
+            @click="$emit('logout')"
             >
                 <v-icon>mdi-logout-variant</v-icon>
                 Logout
@@ -42,6 +46,11 @@ export default {
     data: () => ({
         nav: [
             {
+                text: 'Status',
+                icon: 'monitor-dashboard',
+                url_name: 'admin-status',
+            },
+            {
                 text: 'Announcement',
                 icon: 'bullhorn-outline',
                 url_name: 'admin-announcement',
@@ -49,7 +58,7 @@ export default {
             {
                 text: 'Election',
                 icon: 'printer-outline',
-                url_name: 'election',
+                url_name: 'admin-election',
             },
             // {
             //     text: 'Votes',
@@ -66,6 +75,11 @@ export default {
                 icon: 'account-group-outline',
                 url_name: 'admin-voter',
             },
+            {
+                text: 'Party Group',
+                icon: 'flag-outline',
+                url_name: 'admin-partylist',
+            },
         ]
     }),
     methods: {
@@ -75,7 +89,7 @@ export default {
         getUrl() {
             let url = this.$route.fullPath
             let path = url.split('/')
-            return path[1]
+            return path[1]+'-'+path[2]
         }
     }
 }

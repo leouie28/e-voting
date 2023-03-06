@@ -2,7 +2,7 @@
     <v-app v-if="!fetching" id="inspire">
         <Login v-if="!auth"></Login>
         <Student @logout="logout" v-else-if="auth==2"></Student>
-        <Admin v-else-if="auth==1"></Admin>
+        <Admin @logout="logout" v-else-if="auth==1"></Admin>
     </v-app>
 </template>
 <script>
@@ -18,9 +18,11 @@ export default {
     data: () => ({
         fetching: true,
         auth: false,
+        specialRoute: false,
     }),
     methods: {
         checkAuth() {
+            console.log(this.checkRoute())
             axios.get(`/web/check-auth`).then(({data})=>{
                 this.auth = data
                 console.log(data,'auth')
@@ -29,6 +31,12 @@ export default {
                     this.fetching = false
                 },500)
             })
+        },
+        checkRoute() {
+            let route = this.$route
+            if(route.name=='student-election') {
+                return true
+            }
         },
         logout() {
             axios.get(`/web/logout`).then(({data})=>{
@@ -51,3 +59,6 @@ export default {
     }
 }
 </script>
+<style lang="css">
+    @import url('../../css/app.css');
+</style>

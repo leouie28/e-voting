@@ -17,12 +17,14 @@ class CreateElectionsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('school_year');
-            $table->longText('description');
+            $table->longText('description')->nullable();
             $table->boolean('active')->default(false);
             $table->date('date_open')->nullable();
             $table->time('time_open')->nullable();
             $table->date('date_close')->nullable();
             $table->time('time_close')->nullable();
+            $table->string('code')->nullable();
+            $table->string('urlkey');
             $table->integer('maker')->nullable();
             $table->timestamps();
         });

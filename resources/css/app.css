@@ -1,0 +1,26 @@
+.v-divider{
+    /* border-color: rgb(10, 10, 10) !important; */
+    border-color: #757575 !important;
+}
+.hide{
+    display: none;
+}
+.clickable-item tbody tr{
+    cursor: pointer !important;
+}
+.elec-card{
+    border: 1px solid rgb(185, 185, 185) !important;
+}
+.cus-border-top {
+    border-top: 10px solid #2196f3 !important;
+}
+.empty-container {
+    height: 80vh;
+    padding-top: 25vh;
+}
+.v-data-table__wrapper td {
+    max-width: 200px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

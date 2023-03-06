@@ -9,14 +9,32 @@ export default {
     data(vm) {
         return {
             active_route: "/",
+            data_items: [],
             selected: [],
             records: [],
         };
     },
     methods: {
-        viewProduct() {},
+        viewItem(item) {
+            // this.$router.push({path: this.$route.path+'/'+item.id})
+        },
         resetFilter() {},
+        imageSrc(image) {
+            return image.path+image.file_name
+        },
+        createImageBase64(file) {
+            var reader = new FileReader();
+
+            return new Promise((resolve, reject) => {
+                reader.onload = (e) => {
+                    let res = e.target.result;
+                    resolve(res);
+                };
+                reader.readAsDataURL(file);
+            });
+        },
         addNew() {
+            this._commit('is_editing', false)
             this.form = true;
         },
         _asset(file) {
@@ -294,8 +312,8 @@ export default {
         },
         numberSeparator(value) {
             return value
-                .toString()
-                .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                // .toString()
+                // .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
         },
         ucase(value) {
             if (value) return value.toUpperCase();

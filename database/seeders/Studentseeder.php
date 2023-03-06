@@ -7,17 +7,17 @@ use Illuminate\Database\Seeder;
 
 class Studentseeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
-    {
-        Student::create([
-            'name' => 'Mark Leouie Tabique',
-            'student_id' => '123456789',
-            'password' => bcrypt('123'),
-        ]);
-    }
+  /**
+   * Run the database seeds.
+   *
+   * @return void
+   */
+  public function run()
+  {
+    Student::create([
+      'name' => 'Student Test',
+      'student_id' => '123-123123',
+      'password' => bcrypt('123'),
+    ]);
+  }
 }
