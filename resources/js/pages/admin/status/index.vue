@@ -37,7 +37,14 @@
                     <v-row>
                         <v-col md="8" cols="12">
                             <v-card outlined>
-                                <v-card-title class="mb-0 pb-0">Status</v-card-title>
+                                <v-card-title class="mb-0 pb-0">
+                                  <span>Election Status</span>
+                                  <v-spacer></v-spacer>
+                                  <v-btn color="success" @click="downloadPdf">
+                                    Donload result
+                                    <v-icon class="ml-1" small>mdi-download</v-icon>
+                                  </v-btn>
+                                </v-card-title>
                                 <v-divider></v-divider>
                                 <v-card-text class="pt-0">
                                     <custom-bar :elect="elect"></custom-bar>
@@ -121,6 +128,14 @@ export default {
                     this.getElection()
                 }
             })
+        },
+        downloadPdf() {
+          let val = this.elect
+          if(val.date_close<this.moment().format('YYYY-MM-DD')) {
+            window.open(`${window.location.origin}/web/download-result/${val.id}`);
+          }else {
+            alert('Election is not finish!\nYou can download election result after the election')
+          }
         },
         getElection() {
             let id = this.selectedId

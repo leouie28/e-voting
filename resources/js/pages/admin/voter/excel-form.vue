@@ -97,14 +97,15 @@ export default {
                 // form data
                 let formData = new FormData();
                 formData.append('file', this.file);
-                axios.post(`/admin-api/student/insert-excel`, formData, config).then(({data}) => {
-                  this.inserting = false
-                  this.$emit('notify', data)
-                }).finally(() => {
-                    setTimeout(() => {
-                        this.inserting = false
-                    },2000)
-                })
+                console.log(formData, 'data')
+                // axios.post(`/admin-api/student/insert-excel`, formData, config).then(({data}) => {
+                //   this.inserting = false
+                //   this.$emit('notify', data)
+                // }).finally(() => {
+                //     setTimeout(() => {
+                //         this.inserting = false
+                //     },2000)
+                // })
             }else{
                 alert('Empty file')
             }

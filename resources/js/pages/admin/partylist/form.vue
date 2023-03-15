@@ -186,7 +186,7 @@ export default {
                 if(val) {
                     console.log(val,'form')
                     this.payload = val
-                    if(val.images.length>=1){
+                    if(val.images?.length>=1){
                         this.old_img = val.images[0].path + val.images[0].file_name
                         this.payload.image = val.images[0].path + val.images[0].file_name
                     }

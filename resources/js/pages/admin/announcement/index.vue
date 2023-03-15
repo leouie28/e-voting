@@ -31,13 +31,12 @@
                 <template v-slot:[`item.action`]="{ item }">
                     <v-btn
                         color="primary"
-                        small
+                        icon
                         @click="editItem(item)"
                     >
-                        <v-icon small class="mr-1">mdi-eye</v-icon>
-                        View
+                        <v-icon>mdi-eye</v-icon>
                     </v-btn>
-                    <!-- <v-btn
+                    <v-btn
                         class="px-2"
                         elevation="0"
                         icon
@@ -45,7 +44,7 @@
                         @click="warning(item)"
                     >
                         <v-icon>mdi-trash-can</v-icon>
-                    </v-btn> -->
+                    </v-btn>
                 </template>
                 <template v-slot:no-data>
                     <div>No Data</div>

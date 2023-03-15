@@ -10,6 +10,7 @@ use App\Models\ExtractedVote;
 use App\Models\Image;
 use App\Models\Position;
 use App\Models\Vote;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -223,5 +224,13 @@ class ElectionController extends Controller
       'type' => 'success',
       'message' => 'Election successfully removed.'
     ];
+  }
+
+  public function downloadResult($id)
+  {
+    $election = Election::with('positions')->find($id);
+    $pdf = Pdf::loadView('result', ['data' => $election]);
+
+    return $pdf->stream();
   }
 }

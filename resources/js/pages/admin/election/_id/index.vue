@@ -9,7 +9,7 @@
         permanent>
             <v-list dense nav>
                 <v-list-item>
-                    <v-btn block>
+                    <v-btn block @click="$router.back()">
                         <v-icon class="mr-2">mdi-backspace</v-icon>
                         Return
                     </v-btn>

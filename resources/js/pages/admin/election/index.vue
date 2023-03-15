@@ -83,7 +83,23 @@
                         </template>
                         <span>Edit</span>
                     </v-tooltip>
-                    <v-tooltip bottom color="error">
+                    <v-tooltip bottom color="success">
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                class="px-2"
+                                elevation="0"
+                                icon
+                                color="success"
+                                v-bind="attrs"
+                                v-on="on"
+                                @click="downloadPdf(item)"
+                            >
+                                <v-icon>mdi-download</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>Download result as pdf</span>
+                    </v-tooltip>
+                    <!-- <v-tooltip bottom color="error">
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
                                 class="px-2"
@@ -98,7 +114,7 @@
                             </v-btn>
                         </template>
                         <span>Remove</span>
-                    </v-tooltip>
+                    </v-tooltip> -->
                 </template>
                 <template v-slot:no-data>
                     <div>No Data</div>
@@ -219,6 +235,13 @@ export default {
             this.$router.push({
                 path: this.$route.path + "/" + item.id + "/status",
             });
+        },
+        downloadPdf(val) {
+          if(val.date_close<this.moment().format('YYYY-MM-DD')) {
+            window.open(`${window.location.origin}/web/download-result/${val.id}`);
+          }else {
+            alert('Election is not finish!\nYou can download election result after the election')
+          }
         },
         getStatus(item) {
             let now = this.moment();

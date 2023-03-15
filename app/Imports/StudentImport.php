@@ -25,6 +25,12 @@ class StudentImport implements
    *
    * @return \Illuminate\Database\Eloquent\Model|null
    */
+
+  // public function __construct($type)
+  // {
+  //   $this->type = $type;
+  // }
+
   public function model(array $row)
   {
     return new Student([
