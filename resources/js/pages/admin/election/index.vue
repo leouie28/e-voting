@@ -237,7 +237,7 @@ export default {
             });
         },
         downloadPdf(val) {
-          if(val.date_close<this.moment().format('YYYY-MM-DD')) {
+          if(this.moment(val.date_close + ' ' + val.time_close).format('YYYY-MM-DD HH:mm:ss')<this.moment().format('YYYY-MM-DD HH:mm:ss')) {
             window.open(`${window.location.origin}/web/download-result/${val.id}`);
           }else {
             alert('Election is not finish!\nYou can download election result after the election')
