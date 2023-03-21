@@ -36,7 +36,7 @@ class StudentImport implements
     return new Student([
       'student_id' => $row[0],
       'name' => $row[1],
-      'password' => bcrypt(12345)
+      'password' => bcrypt('ckc2023')
     ]);
   }
 
