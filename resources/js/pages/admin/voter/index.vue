@@ -143,6 +143,7 @@ export default {
             })
         },
         notify(data) {
+            this.excelForm = false
           this._newAlert(true, data.type, data.message)
         },
         update(payload) {
