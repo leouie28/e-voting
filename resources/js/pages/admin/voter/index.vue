@@ -143,8 +143,9 @@ export default {
             })
         },
         notify(data) {
+            this.fetchPage()
             this.excelForm = false
-          this._newAlert(true, data.type, data.message)
+            this._newAlert(true, data.type, data.message)
         },
         update(payload) {
             axios.put(`/admin-api/student/${this.selectedItem.id}`, payload).then(({ data }) => {

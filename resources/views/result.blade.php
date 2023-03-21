@@ -110,7 +110,7 @@
     </table>
     <div style="margin-top: 200px; margin-bottom: 50px">
       <div style="float:left; margin-top:20px;">
-        <span style="border-top: 1px solid black; font-weight:bold; font-size:16px; padding-top:2px;">
+        <span style="border-top: 1px solid black; font-size:16px; padding-top:2px;">
           Chairman, CKC Commission on Elections
         </span>
       </div>
