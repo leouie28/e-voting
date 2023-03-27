@@ -14,11 +14,11 @@ class AdminSeeder extends Seeder
    */
   public function run()
   {
-    Admin::create([
-      'name' => 'Admin',
-      'admin_id' => 'admin',
-      'password' => bcrypt('admin'), //password
-    ]);
+//     Admin::create([
+//       'name' => 'Admin',
+//       'admin_id' => 'admin',
+//       'password' => bcrypt('admin'), //password
+//     ]);
       
     Admin::create([
       'name' => 'Admin2',
